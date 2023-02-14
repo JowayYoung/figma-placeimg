@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"lib": [
+			"ES6"
+		],
+		"removeComments": true,
+		"strict": true,
+		"target": "ES6",
+		"typeRoots": [
+			"./node_modules/@types",
+			"./node_modules/@figma"
+		]
+	}
+}

@@ -1,0 +1,3 @@
+{
+	"stylelint.customSyntax": "postcss-html",
+}
