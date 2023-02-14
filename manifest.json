@@ -2,8 +2,8 @@
 	"name": "figma-placeimg",
 	"id": "1206943666352895417",
 	"api": "1.0.0",
-	"main": "code.js",
-	"ui": "ui.html",
+	"main": "dist/index.js",
+	"ui": "src/index.html",
 	"editorType": [
 		"figma",
 		"figjam"
