@@ -5,7 +5,7 @@
 	"main": "dist/index.js",
 	"scripts": {
 		"build": "vite build",
-		"clean": "rimraf node_modules package-lock.json pnpm-lock.yaml yarn.lock"
+		"clean": "rimraf dist node_modules package-lock.json pnpm-lock.yaml yarn.lock"
 	},
 	"dependencies": {},
 	"devDependencies": {
