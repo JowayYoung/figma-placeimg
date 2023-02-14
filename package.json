@@ -7,6 +7,10 @@
 		"phone": "18819249731",
 		"email": "young.joway@aliyun.com"
 	},
-	"scripts": {},
+	"scripts": {
+		"build": "pnpm --stream -r run build",
+		"clean": "rimraf node_modules package-lock.json pnpm-lock.yaml yarn.lock && pnpm --stream -r run clean",
+		"dev": "pnpm --filter ui run dev"
+	},
 	"license": "MIT"
 }
