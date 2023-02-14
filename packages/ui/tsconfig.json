@@ -1,16 +1,44 @@
 {
 	"compilerOptions": {
-		"outDir": "dist",
+		"allowJs": true,
+		"allowSyntheticDefaultImports": true,
+		"baseUrl": ".",
+		"downlevelIteration": true,
+		"esModuleInterop": true,
+		"experimentalDecorators": true,
+		"forceConsistentCasingInFileNames": true,
+		"jsx": "react-jsx",
 		"lib": [
-			"ES6"
+			"DOM",
+			"DOM.Iterable",
+			"ES2015",
+			"ES2016",
+			"ES2017",
+			"ES2018",
+			"ES2019",
+			"ES2020",
+			"ES2021",
+			"ES2022",
+			"ESNext"
 		],
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"outDir": "dist",
 		"removeComments": true,
-		"rootDir": "src",
+		"resolveJsonModule": true,
 		"strict": true,
 		"target": "ES6",
 		"typeRoots": [
-			"./node_modules/@types",
-			"./node_modules/@figma"
-		]
-	}
+			"node_modules/@types",
+			"node_modules/@figma"
+		],
+		"useDefineForClassFields": true,
+	},
+	"exclude": [
+		"./node_modules"
+	],
+	"include": [
+		"./src",
+		"./vite.config.ts"
+	]
 }
