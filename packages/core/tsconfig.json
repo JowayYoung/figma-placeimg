@@ -1,11 +1,11 @@
 {
 	"compilerOptions": {
-		"baseUrl": ".",
 		"outDir": "dist",
 		"lib": [
 			"ES6"
 		],
 		"removeComments": true,
+		"rootDir": "src",
 		"strict": true,
 		"target": "ES6",
 		"typeRoots": [

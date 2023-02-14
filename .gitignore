@@ -1,7 +1,5 @@
 dist
 node_modules
-out
-code.js
 package-lock.json
 pnpm-lock.yaml
 yarn.lock

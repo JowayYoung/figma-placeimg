@@ -1,0 +1,17 @@
+{
+	"name": "@placeimg/figma-core",
+	"version": "1.0.0",
+	"description": "",
+	"main": "dist/index.js",
+	"scripts": {
+		"build": "tsc -p tsconfig.json",
+		"clean": "rimraf node_modules package-lock.json pnpm-lock.yaml yarn.lock",
+		"watch": "npm run build -- --watch"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@figma/plugin-typings": "1.58.0",
+		"typescript": "4.9.5"
+	},
+	"license": "MIT"
+}
