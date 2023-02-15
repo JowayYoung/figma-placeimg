@@ -57,8 +57,8 @@ export default function App(): JSX.Element {
 			<Form
 				className="placeimg-form"
 				form={form}
-				labelCol={{ span: 4 }}
-				wrapperCol={{ span: 12 }}
+				labelCol={{ span: 5 }}
+				wrapperCol={{ span: 15 }}
 				initialValues={initForm}
 				onFinish={onSubmit}
 			>
@@ -94,7 +94,7 @@ export default function App(): JSX.Element {
 						{filtersDom}
 					</Radio.Group>
 				</Form.Item>
-				<Form.Item wrapperCol={{ offset: 4, span: 12 }}>
+				<Form.Item wrapperCol={{ offset: 5, span: 15 }}>
 					<Button
 						className="placeimg-form-btn"
 						type="primary"
@@ -103,7 +103,7 @@ export default function App(): JSX.Element {
 						loading={loading}
 					>插入</Button>
 				</Form.Item>
-				<Form.Item wrapperCol={{ offset: 4, span: 12 }}>
+				<Form.Item wrapperCol={{ offset: 5, span: 15 }}>
 					<Button
 						className="placeimg-form-btn"
 						type="dashed"
