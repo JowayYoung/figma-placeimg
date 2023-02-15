@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "dist/index.js",
 	"scripts": {
-		"build": "vite build",
+		"build": "vite build --emptyOutDir",
 		"clean": "rimraf dist node_modules package-lock.json pnpm-lock.yaml yarn.lock",
 		"dev": "vite",
 		"preview": "vite preview"
