@@ -5,6 +5,7 @@ import { Button, Form, Input, Radio } from "antd";
 import "./assets/css/reset.css";
 import "./index.scss";
 import { CATEGORYS, FILTERS } from "./utils/getting";
+import { DownloadImg } from "./utils/setting";
 
 interface FormType {
 	category: string
@@ -27,11 +28,13 @@ export default function App(): JSX.Element {
 	const onSubmit = async(form: FormType): Promise<void> => {
 		setLoading(true);
 		const { category, filter, height, width } = form;
+		const url = `https://placeimg.com/${width}/${height}/${category}/${filter === "normal" ? "" : filter}`.replace(/\/$/, "");
+		const data = await DownloadImg(url);
 		parent.postMessage({
 			pluginMessage: {
+				data,
 				height: +height,
 				type: "insert",
-				url: `https://placeimg.com/${width}/${height}/${category}/${filter === "normal" ? "" : filter}`.replace(/\/$/, ""),
 				width: +width
 			}
 		}, "*");

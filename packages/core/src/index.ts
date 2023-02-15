@@ -1,26 +1,15 @@
-import NodeFetch from "node-fetch";
-
-async function DownloadImg(url: string = ""): Promise<Uint8Array> {
-	const res = await NodeFetch(url);
-	const blob = await res.blob();
-	const arrayBuffer = await blob.arrayBuffer();
-	const u8a = new Uint8Array(arrayBuffer);
-	return u8a;
-}
-
 figma.showUI(__html__, {
 	height: 500,
 	width: 800
 });
 
-figma.ui.on("message", async(msg) => {
-	console.log(msg.type, msg); // url、width、height
+figma.ui.on("message", msg => {
+	console.log(msg.type, msg); // data、width、height
 	if (msg.type !== "insert") return;
 	const rect: RectangleNode = figma.currentPage.selection.length === 1 && figma.currentPage.selection[0].type === "RECTANGLE"
 		? figma.currentPage.selection[0] // 使用选中的矩形
 		: figma.createRectangle(); // 创建矩形
-	const data = await DownloadImg(msg.url);
-	const image = figma.createImage(data);
+	const image = figma.createImage(msg.data);
 	rect.resize(msg.width, msg.height);
 	rect.fills = [{
 		imageHash: image.hash,
