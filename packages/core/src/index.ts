@@ -1,5 +1,5 @@
 figma.showUI(__html__, {
-	height: 500,
+	height: 800,
 	width: 800
 });
 
@@ -20,7 +20,7 @@ figma.ui.on("message", msg => {
 	figma.currentPage.appendChild(rect); // 将新建数据插入到画布中
 	figma.currentPage.selection = [rect]; // 选中位置插入新建数据
 	figma.viewport.scrollAndZoomIntoView([rect]); // 滚动缩放视野到刚插入的插入新建数据中
-	figma.closePlugin();
+	figma.closePlugin(); // 确保完成后关闭插件，否则插件将继续运行，这会在屏幕底部显示取消按钮
 });
 
 figma.on("selectionchange", () => {
@@ -33,25 +33,3 @@ figma.on("selectionchange", () => {
 		});
 	}
 });
-
-// const FetchScript = (url: string = "", width: number = 0, height: number = 0): string => `
-// <script>
-// 	fetch(${url}).then(res => res.arrayBuffer()).then(res => parent.postMessage({
-// 		pluginMessage: {
-// 			height: ${height},
-// 			data: new Uint8Array(res)
-// 			type: "insert",
-// 			width: ${width}
-// 		}
-// 	}, "*"));
-// </script>
-// `;
-
-// figma.ui.on("message", msg => {
-// 	console.log(msg.type, msg); // url、width、height
-// 	if (msg.type !== "render") return;
-// 	const code = FetchScript(msg.url, msg.width, msg.height);
-// 	console.log("fetch code", code);
-// 	figma.showUI(code, { visible: false });
-// 	figma.closePlugin(); // 确保完成后关闭插件，否则插件将继续运行，这会在屏幕底部显示取消按钮
-// });

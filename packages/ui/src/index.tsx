@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { WaitFor } from "@yangzw/bruce-us";
+import React, { type SyntheticEvent, useEffect, useState, useRef } from "react";
 import { Button, Form, Input, Radio } from "antd";
 
 import "./assets/css/reset.css";
 import "./index.scss";
 import { CATEGORYS, FILTERS } from "./utils/getting";
-import { DownloadImg } from "./utils/setting";
+import { Base64ToU8a } from "./utils/setting";
 
 interface FormType {
 	category: string
@@ -15,6 +14,8 @@ interface FormType {
 }
 
 export default function App(): JSX.Element {
+	const img = useRef<HTMLImageElement>(null);
+	const [link, setLink] = useState<string>("");
 	const [loading, setLoading] = useState<boolean>(false);
 	const [form] = Form.useForm();
 	const initForm: FormType = {
@@ -29,20 +30,11 @@ export default function App(): JSX.Element {
 		setLoading(true);
 		const { category, filter, height, width } = form;
 		const url = `https://placeimg.com/${width}/${height}/${category}/${filter === "normal" ? "" : filter}`.replace(/\/$/, "");
-		const data = await DownloadImg(url);
-		parent.postMessage({
-			pluginMessage: {
-				data,
-				height: +height,
-				type: "insert",
-				width: +width
-			}
-		}, "*");
-		await WaitFor();
-		onReset();
+		setLink(url);
 	};
 	const onReset = (): void => {
 		form.resetFields();
+		setLink("");
 		setLoading(false);
 	};
 	const onUpdate = (e: MessageEvent): void => {
@@ -51,12 +43,30 @@ export default function App(): JSX.Element {
 			form.setFieldValue("height", e.data.pluginMessage.height);
 		}
 	};
+	const onLoad = (e: SyntheticEvent<HTMLImageElement>): void => {
+		const canvas = document.createElement("canvas");
+		const ctx = canvas.getContext("2d");
+		canvas.width = img.current?.width ?? 0;
+		canvas.height = img.current?.height ?? 0;
+		img.current?.setAttribute("crossOrigin", "anonymous");
+		img.current && ctx?.drawImage(img.current, 0, 0);
+		const base64 = canvas.toDataURL("image/png");
+		console.log("base64", base64);
+		parent.postMessage({
+			pluginMessage: {
+				data: Base64ToU8a(base64),
+				type: "insert"
+			}
+		}, "*");
+		form.resetFields();
+		setLoading(false);
+	};
 	useEffect(() => {
 		window.addEventListener("message", onUpdate);
 		return () => window.removeEventListener("message", onUpdate);
 	}, []); // eslint-disable-line
 	return (
-		<div className="placeimg-page flex-ct-x">
+		<div className="placeimg-page pr flex-ct-x">
 			<Form
 				className="placeimg-form"
 				form={form}
@@ -115,6 +125,7 @@ export default function App(): JSX.Element {
 					>重置</Button>
 				</Form.Item>
 			</Form>
+			{!!link && <img className="placeimg-img abs-ct" ref={img} src={link} onLoad={e => onLoad(e)} />}
 		</div>
 	);
 }
