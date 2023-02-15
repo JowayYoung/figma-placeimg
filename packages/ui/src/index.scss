@@ -1,5 +1,11 @@
 .placeimg {
-	&-btn {
-		width: 100%;
+	&-page {
+		height: 100vh;
+	}
+	&-form {
+		width: 750px;
+		&-btn {
+			width: 100%;
+		}
 	}
 }

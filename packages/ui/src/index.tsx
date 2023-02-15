@@ -53,8 +53,9 @@ export default function App(): JSX.Element {
 		return () => window.removeEventListener("message", onUpdate);
 	}, []); // eslint-disable-line
 	return (
-		<div className="placeimg-page">
+		<div className="placeimg-page flex-ct-x">
 			<Form
+				className="placeimg-form"
 				form={form}
 				labelCol={{ span: 4 }}
 				wrapperCol={{ span: 12 }}
@@ -95,7 +96,7 @@ export default function App(): JSX.Element {
 				</Form.Item>
 				<Form.Item wrapperCol={{ offset: 4, span: 12 }}>
 					<Button
-						className="placeimg-btn"
+						className="placeimg-form-btn"
 						type="primary"
 						htmlType="submit"
 						shape="round"
@@ -104,7 +105,7 @@ export default function App(): JSX.Element {
 				</Form.Item>
 				<Form.Item wrapperCol={{ offset: 4, span: 12 }}>
 					<Button
-						className="placeimg-btn"
+						className="placeimg-form-btn"
 						type="dashed"
 						onClick={onReset}
 						shape="round"
