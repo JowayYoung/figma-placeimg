@@ -10,7 +10,7 @@
 	"scripts": {
 		"build": "pnpm --stream -r run build",
 		"clean": "rimraf node_modules package-lock.json pnpm-lock.yaml yarn.lock && pnpm --stream -r run clean",
-		"dev": "pnpm --filter ui run dev"
+		"dev": "pnpm --filter @placeimg/figma-ui run dev"
 	},
 	"license": "MIT"
 }

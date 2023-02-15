@@ -1,4 +1,9 @@
-.main-page {
-	height: 100vh;
-	background-color: #050512;
+.placeimg {
+	&-page {
+		padding: 20px;
+		height: 100vh;
+	}
+	&-btn {
+		width: 100%;
+	}
 }
