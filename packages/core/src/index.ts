@@ -1,6 +1,5 @@
 async function LoadImage(url: string = ""): Promise<Uint8Array> {
 	const res = await fetch(url);
-	console.log("img", res);
 	const buffer = await res.arrayBuffer();
 	return new Uint8Array(buffer);
 }
@@ -12,6 +11,7 @@ figma.showUI(__html__, {
 
 if (figma.editorType === "figma") {
 	figma.ui.onmessage = async(msg) => {
+		console.log("params", msg);
 		if (msg.type === "insert") {
 			const rectNode: RectangleNode = figma.currentPage.selection.length === 1 && figma.currentPage.selection[0].type === "RECTANGLE"
 				? figma.currentPage.selection[0]

@@ -29,10 +29,10 @@ export default function App(): JSX.Element {
 		const { category, filter, height, width } = form;
 		parent.postMessage({
 			pluginMessage: {
-				height,
+				height: +height,
 				type: "insert",
 				url: `https://placeimg.com/${width}/${height}/${category}/${filter === "normal" ? "" : filter}`.replace(/\/$/, ""),
-				width
+				width: +width
 			}
 		}, "*");
 		await WaitFor();
