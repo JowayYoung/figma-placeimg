@@ -35,10 +35,10 @@
 		"useDefineForClassFields": true,
 	},
 	"exclude": [
-		"./node_modules"
+		"node_modules"
 	],
 	"include": [
-		"./src",
-		"./vite.config.ts"
+		"src",
+		"vite.config.ts"
 	]
 }
