@@ -189,7 +189,9 @@ export default function App(): JSX.Element {
 					>重置</Button>
 				</Form.Item>
 			</Form>
-			<img className="placeimg-img" id="placeimg-img" />
+			<div className="placeimg-img pr">
+				<img className="placeimg-img-cover" id="placeimg-img" />
+			</div>
 		</div>
 	);
 }

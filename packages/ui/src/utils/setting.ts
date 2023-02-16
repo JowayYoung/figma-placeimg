@@ -32,7 +32,7 @@ function DownloadImg({
 		ctx.textAlign = "center";
 		ctx.textBaseline = "middle";
 		ctx.fillStyle = color;
-		WrapText({ content, ctx, height, lineHeight, width });
+		WrapText({ content, ctx, fontSize, height, lineHeight, width });
 	}
 	const base64 = canvas.toDataURL();
 	img?.setAttribute("src", base64);
@@ -47,6 +47,7 @@ function DownloadImg({
 interface WrapTextType {
 	content: string
 	ctx: CanvasRenderingContext2D
+	fontSize: number
 	height: number
 	lineHeight: number
 	width: number
@@ -55,6 +56,7 @@ interface WrapTextType {
 function WrapText({
 	content = "",
 	ctx,
+	fontSize,
 	height,
 	lineHeight,
 	width
@@ -65,16 +67,17 @@ function WrapText({
 		const index = line.length - 1; // 当前行
 		line[index] += text[n]; // 累加单个文本
 		const lineWidth = ctx.measureText(line[index]).width;
-		lineWidth >= width && line.push("");
+		lineWidth + 20 >= width && n < text.length - 2 && line.push("");
 	}
 	const len = line.length;
 	const half = len / 2;
 	const hx = width / 2;
 	const hy = height / 2;
+	const textOffset = (lineHeight - fontSize) / 2;
+	const error = 0.5 / (lineHeight / fontSize);
 	line.forEach((v, i) => {
 		const offset = i < half ? -1 * (half - i) : (i - half);
-		// console.log(i, "offset", offset);
-		const y = hy + offset * lineHeight;
+		const y = hy + (offset + error) * lineHeight + textOffset;
 		ctx.fillText(v, hx, y);
 	});
 }

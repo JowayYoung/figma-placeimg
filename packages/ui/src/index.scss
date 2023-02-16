@@ -16,7 +16,29 @@
 		}
 	}
 	&-img {
-		max-width: 200px;
-		max-height: 200px;
+		&::before {
+			position: absolute;
+			left: 0;
+			top: 50%;
+			width: 100%;
+			height: 1px;
+			background-color: #f66;
+			content: "";
+			transform: translateY(-50%);
+		}
+		&::after {
+			position: absolute;
+			left: 50%;
+			top: 0;
+			width: 1px;
+			height: 100%;
+			background-color: #f66;
+			content: "";
+			transform: translateX(-50%);
+		}
+		&-cover {
+			max-width: 200px;
+			max-height: 200px;
+		}
 	}
 }
