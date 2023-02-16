@@ -61,7 +61,7 @@ export default function App(): JSX.Element {
 			content,
 			fontSize,
 			height: +height,
-			lineHeight: +height * lineHeight,
+			lineHeight: fontSize * lineHeight,
 			width: +width
 		};
 		console.log("占位图配置", opts);

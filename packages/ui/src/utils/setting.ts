@@ -32,14 +32,7 @@ function DownloadImg({
 		ctx.textAlign = "center";
 		ctx.textBaseline = "middle";
 		ctx.fillStyle = color;
-		WrapText({
-			content,
-			ctx,
-			lineHeight,
-			maxWidth: width,
-			x: width / 2,
-			y: height / 2
-		});
+		WrapText({ content, ctx, height, lineHeight, width });
 	}
 	const base64 = canvas.toDataURL();
 	img?.setAttribute("src", base64);
@@ -54,35 +47,36 @@ function DownloadImg({
 interface WrapTextType {
 	content: string
 	ctx: CanvasRenderingContext2D
+	height: number
 	lineHeight: number
-	maxWidth: number
-	x: number
-	y: number
+	width: number
 }
 
 function WrapText({
 	content = "",
 	ctx,
+	height,
 	lineHeight,
-	maxWidth,
-	x = 0,
-	y = 0
+	width
 }: WrapTextType): void {
-	const textArr = content.split("");
-	let line = "";
-	for (let n = 0; n < textArr.length; n++) {
-		const testLine = line + textArr[n];
-		const metrics = ctx.measureText(testLine);
-		const testWidth = metrics.width;
-		if (testWidth > maxWidth && n > 0) {
-			ctx.fillText(line, x, y);
-			line = textArr[n];
-			y += lineHeight;
-		} else {
-			line = testLine;
-		}
+	const text = content.split("");
+	const line: string[] = [""];
+	for (let n = 0; n < text.length; n++) {
+		const index = line.length - 1; // 当前行
+		line[index] += text[n]; // 累加单个文本
+		const lineWidth = ctx.measureText(line[index]).width;
+		lineWidth >= width && line.push("");
 	}
-	ctx.fillText(line, x, y);
+	const len = line.length;
+	const half = len / 2;
+	const hx = width / 2;
+	const hy = height / 2;
+	line.forEach((v, i) => {
+		const offset = i < half ? -1 * (half - i) : (i - half);
+		// console.log(i, "offset", offset);
+		const y = hy + offset * lineHeight;
+		ctx.fillText(v, hx, y);
+	});
 }
 
 export {
