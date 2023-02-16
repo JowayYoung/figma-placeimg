@@ -4,16 +4,21 @@
 	}
 	&-form {
 		width: 750px;
+		&-handler {
+			margin-top: -15px;
+			.ant-form-item-control-input-content {
+				display: flex;
+				justify-content: space-between;
+			}
+		}
 		&-btn {
-			width: 100%;
+			width: 45%;
 		}
 	}
 	&-img {
-		z-index: -1;
-		border-radius: 10px;
 		min-width: 100px;
-		max-width: 400px;
-		min-height: 75px;
+		max-width: 300px;
+		min-height: 100px;
 		max-height: 300px;
 	}
 }
