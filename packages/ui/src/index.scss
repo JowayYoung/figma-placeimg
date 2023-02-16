@@ -4,8 +4,10 @@
 	}
 	&-form {
 		width: 750px;
+		&-item {
+			margin-bottom: 10px;
+		}
 		&-handler {
-			margin-top: -15px;
 			.ant-form-item-control-input-content {
 				display: flex;
 				justify-content: space-between;
@@ -19,8 +21,12 @@
 		width: 300px;
 		height: 300px;
 		outline: 1px dashed rgba(#000, .5);
-		&::before {
+		&::before,
+		&::after {
 			position: absolute;
+			content: "";
+		}
+		&::before {
 			left: 0;
 			top: 50%;
 			border-top: 1px dashed #f66;
@@ -29,12 +35,10 @@
 			transform: translateY(-50%);
 		}
 		&::after {
-			position: absolute;
 			left: 50%;
 			top: 0;
 			border-left: 1px dashed #f66;
 			height: 100%;
-			content: "";
 			transform: translateX(-50%);
 		}
 		&-cover {

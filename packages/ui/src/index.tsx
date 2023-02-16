@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Form, Input, Radio, Slider } from "antd";
+import { Button, Form, Input, Radio, Slider, Switch } from "antd";
 import { type SliderMarks } from "antd/es/slider";
 
 import "./assets/css/reset.css";
@@ -9,6 +9,7 @@ import { DownloadImg } from "./utils/setting";
 
 interface FormType {
 	bgColor: string
+	bgImage: boolean
 	color: string
 	content: string
 	fontSize: number
@@ -20,11 +21,13 @@ interface FormType {
 export default function App(): JSX.Element {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [fontSizeRange, setFontSizeRange] = useState<number[]>([10, 50]);
+	const [editImgColor, setEditImgColor] = useState<boolean>(true);
 	const [editText, setEditText] = useState<boolean>(false);
 	const [editTextSize, setEditTextSize] = useState<boolean>(false);
 	const [form] = Form.useForm();
 	const initForm: FormType = {
 		bgColor: "",
+		bgImage: false,
 		color: "",
 		content: "",
 		fontSize: fontSizeRange[0],
@@ -49,14 +52,16 @@ export default function App(): JSX.Element {
 			const max = _height > 50 ? 50 : _height < 10 ? 10 : _height;
 			setFontSizeRange([10, max]);
 		}
+		setEditImgColor(!allChange.bgImage);
 		setEditText(!!allChange.width && !!allChange.height);
 		setEditTextSize(+allChange.height >= 10);
 	};
 	const onSubmit = (form: FormType): void => {
 		setLoading(true);
-		const { bgColor, color, content, fontSize, height, lineHeight, width } = form;
+		const { bgColor, bgImage, color, content, fontSize, height, lineHeight, width } = form;
 		const opts = {
 			bgColor: `#${bgColor || "f66"}`,
+			bgImage,
 			color: `#${color || "fff"}`,
 			content,
 			fontSize,
@@ -102,6 +107,7 @@ export default function App(): JSX.Element {
 				onValuesChange={onChange}
 			>
 				<Form.Item
+					className="placeimg-form-item"
 					name="width"
 					label="图像宽度"
 					rules={[{ message: "图像宽度由正整数组成", pattern: /^[1-9]\d*$/, required: true }]}
@@ -113,6 +119,7 @@ export default function App(): JSX.Element {
 					/>
 				</Form.Item>
 				<Form.Item
+					className="placeimg-form-item"
 					name="height"
 					label="图像高度"
 					rules={[{ message: "图像高度由正整数组成", pattern: /^[1-9]\d*$/, required: true }]}
@@ -124,17 +131,28 @@ export default function App(): JSX.Element {
 					/>
 				</Form.Item>
 				<Form.Item
+					className="placeimg-form-item"
 					name="bgColor"
-					label="图像背景"
-					rules={[{ message: "图像背景由HEX组成", pattern: /(^[0-9A-F]{6}$)|(^[0-9A-F]{3}$)/i, required: true }]}
+					label="图像颜色"
+					rules={[{ message: "图像颜色由HEX组成", pattern: /(^[0-9A-F]{6}$)|(^[0-9A-F]{3}$)/i, required: true }]}
 				>
 					<Input
-						placeholder="请输入图像背景，形式为ff6666或f66"
+						placeholder="请输入图像颜色，形式为ff6666或f66"
 						addonBefore="#"
 						allowClear
+						disabled={!editImgColor}
 					/>
 				</Form.Item>
 				<Form.Item
+					className="placeimg-form-item"
+					name="bgImage"
+					label="图像背景"
+					valuePropName="checked"
+				>
+					<Switch />
+				</Form.Item>
+				<Form.Item
+					className="placeimg-form-item"
 					name="content"
 					label="文本内容"
 					rules={[{ message: "文本内容由1~100个字符组成", pattern: /^.{1,100}$/ }]}
@@ -149,6 +167,7 @@ export default function App(): JSX.Element {
 					/>
 				</Form.Item>
 				<Form.Item
+					className="placeimg-form-item"
 					name="color"
 					label="文本颜色"
 					rules={[{ message: "文本颜色由HEX组成", pattern: /(^[0-9A-F]{6}$)|(^[0-9A-F]{3}$)/i }]}
@@ -160,12 +179,12 @@ export default function App(): JSX.Element {
 						disabled={!editText}
 					/>
 				</Form.Item>
-				<Form.Item name="lineHeight" label="文本行高">
+				<Form.Item className="placeimg-form-item" name="lineHeight" label="文本行高">
 					<Radio.Group disabled={!editText}>
 						{lineHeightsDom}
 					</Radio.Group>
 				</Form.Item>
-				<Form.Item name="fontSize" label="文本尺寸">
+				<Form.Item className="placeimg-form-item" name="fontSize" label="文本尺寸">
 					<Slider
 						min={fontSizeRange[0]}
 						max={fontSizeRange[1]}
