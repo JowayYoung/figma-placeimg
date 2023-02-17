@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Button, Form, Input, Radio, Slider, Switch } from "antd";
+import React, { Fragment, useEffect, useState } from "react";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { WaitFor } from "@yangzw/bruce-us";
+import { Button, Form, Input, Radio, Slider, Switch, Tooltip } from "antd";
 import { type SliderMarks } from "antd/es/slider";
 
 import "./assets/css/reset.css";
 import "./index.scss";
 import { LINE_HEIGHTS } from "./utils/getting";
-import { DownloadImg } from "./utils/setting";
+import { type DownloadImgType, DownloadImg, RenderImg } from "./utils/setting";
 
 interface FormType {
 	bgColor: string
@@ -20,6 +22,7 @@ interface FormType {
 
 export default function App(): JSX.Element {
 	const [loading, setLoading] = useState<boolean>(false);
+	const [bgImg, setBgImg] = useState<DownloadImgType>({ u8a: null, url: "" });
 	const [fontSizeRange, setFontSizeRange] = useState<number[]>([10, 50]);
 	const [editImgColor, setEditImgColor] = useState<boolean>(true);
 	const [editText, setEditText] = useState<boolean>(false);
@@ -46,22 +49,29 @@ export default function App(): JSX.Element {
 		}
 	};
 	const lineHeightsDom = LINE_HEIGHTS.map(v => <Radio.Button key={v.id} value={v.id}>{v.val}</Radio.Button>);
-	const onChange = (change: FormType, allChange: FormType): void => {
+	const onChange = async(change: FormType, allChange: FormType): Promise<void> => {
 		if (change.height !== undefined) {
 			const _height = +change.height;
 			const max = _height > 50 ? 50 : _height < 10 ? 10 : _height;
 			setFontSizeRange([10, max]);
+		}
+		if (change.bgImage) {
+			setLoading(true);
+			const res = await DownloadImg();
+			await WaitFor();
+			setBgImg(res);
+			setLoading(false);
+		} else {
+			setBgImg({ u8a: null, url: "" });
 		}
 		setEditImgColor(!allChange.bgImage);
 		setEditText(!!allChange.width && !!allChange.height);
 		setEditTextSize(+allChange.height >= 10);
 	};
 	const onSubmit = (form: FormType): void => {
-		setLoading(true);
 		const { bgColor, bgImage, color, content, fontSize, height, lineHeight, width } = form;
-		const opts = {
+		const renderOpts = {
 			bgColor: `#${bgColor || "f66"}`,
-			bgImage,
 			color: `#${color || "fff"}`,
 			content,
 			fontSize,
@@ -69,8 +79,8 @@ export default function App(): JSX.Element {
 			lineHeight: fontSize * lineHeight,
 			width: +width
 		};
-		console.log("占位图配置", opts);
-		const data = DownloadImg(opts);
+		console.log("渲染图像", renderOpts);
+		const data = bgImage && bgImg.u8a && bgImg.url ? bgImg.u8a : RenderImg(renderOpts);
 		parent.postMessage({
 			pluginMessage: {
 				data,
@@ -81,10 +91,7 @@ export default function App(): JSX.Element {
 		}, "*");
 		onReset();
 	};
-	const onReset = (): void => {
-		form.resetFields();
-		setLoading(false);
-	};
+	const onReset = (): void => form.resetFields();
 	const onUpdate = (e: MessageEvent): void => {
 		if (e.data.pluginMessage.type === "update") {
 			form.setFieldValue("width", e.data.pluginMessage.width);
@@ -96,13 +103,14 @@ export default function App(): JSX.Element {
 		return () => window.removeEventListener("message", onUpdate);
 	}, []); // eslint-disable-line
 	return (
-		<div className="placeimg-page flex-ct-y">
+		<div className="placeimg-page">
 			<Form
 				className="placeimg-form"
 				form={form}
 				labelCol={{ span: 5 }}
 				wrapperCol={{ span: 15 }}
 				initialValues={initForm}
+				disabled={loading}
 				onFinish={onSubmit}
 				onValuesChange={onChange}
 			>
@@ -143,13 +151,13 @@ export default function App(): JSX.Element {
 						disabled={!editImgColor}
 					/>
 				</Form.Item>
-				<Form.Item
-					className="placeimg-form-item"
-					name="bgImage"
-					label="图像背景"
-					valuePropName="checked"
-				>
-					<Switch />
+				<Form.Item className="placeimg-form-item switch" label="图像背景">
+					<Fragment>
+						<Form.Item name="bgImage" valuePropName="checked" style={{ marginBottom: 0, marginRight: 10 }}>
+							<Switch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
+						</Form.Item>
+						<Tooltip title={bgImg.url}>随机图片由dog.ceo提供{bgImg.url ? "，图片已生成并保存到内存中" : ""}</Tooltip>
+					</Fragment>
 				</Form.Item>
 				<Form.Item
 					className="placeimg-form-item"
@@ -192,13 +200,12 @@ export default function App(): JSX.Element {
 						disabled={!editText || !editTextSize}
 					/>
 				</Form.Item>
-				<Form.Item className="placeimg-form-handler" wrapperCol={{ offset: 5, span: 15 }}>
+				<Form.Item className="placeimg-form-item btns" wrapperCol={{ offset: 5, span: 15 }}>
 					<Button
 						className="placeimg-form-btn"
 						type="primary"
 						htmlType="submit"
 						shape="round"
-						loading={loading}
 					>插入</Button>
 					<Button
 						className="placeimg-form-btn"

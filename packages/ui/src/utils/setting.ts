@@ -1,4 +1,25 @@
-interface RectType {
+import { Aios } from "@yangzw/bruce-us/dist/web";
+
+interface DownloadImgReturnType {
+	message: string
+	status: string
+}
+
+interface DownloadImgType {
+	u8a: Uint8Array | null
+	url: string
+}
+
+async function DownloadImg(): Promise<DownloadImgType> {
+	const [err, res] = await Aios<DownloadImgReturnType>({ url: "https://dog.ceo/api/breeds/image/random" });
+	const url = !err && res.status === "success" ? res.message : "";
+	const data = await fetch(url);
+	const buffer = await data.arrayBuffer();
+	const u8a = new Uint8Array(buffer);
+	return { u8a, url };
+}
+
+interface RenderImgType {
 	bgColor?: string
 	color?: string
 	content?: string
@@ -8,7 +29,7 @@ interface RectType {
 	width?: number
 }
 
-function DownloadImg({
+function RenderImg({
 	bgColor = "#f66",
 	color = "#fff",
 	content = "",
@@ -16,7 +37,7 @@ function DownloadImg({
 	height = 200,
 	lineHeight = 10,
 	width = 200
-}: RectType): Uint8Array {
+}: RenderImgType): Uint8Array {
 	const img = document.getElementById("placeimg-img");
 	const canvas = document.createElement("canvas");
 	const ctx = canvas.getContext("2d");
@@ -83,6 +104,8 @@ function WrapText({
 }
 
 export {
+	type DownloadImgType,
 	DownloadImg,
+	RenderImg,
 	WrapText
 };
