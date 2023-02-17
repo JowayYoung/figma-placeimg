@@ -1,6 +1,4 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import { WaitFor } from "@yangzw/bruce-us";
 import { Button, Form, Input, Radio, Slider, Switch, Tooltip } from "antd";
 import { type SliderMarks } from "antd/es/slider";
 
@@ -58,7 +56,6 @@ export default function App(): JSX.Element {
 		if (change.bgImage) {
 			setLoading(true);
 			const res = await DownloadImg();
-			await WaitFor();
 			setBgImg(res);
 			setLoading(false);
 		} else {
@@ -154,7 +151,7 @@ export default function App(): JSX.Element {
 				<Form.Item className="placeimg-form-item switch" label="图像背景">
 					<Fragment>
 						<Form.Item name="bgImage" valuePropName="checked" style={{ marginBottom: 0, marginRight: 10 }}>
-							<Switch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
+							<Switch />
 						</Form.Item>
 						<Tooltip title={bgImg.url}>随机图片由dog.ceo提供{bgImg.url ? "，图片已生成并保存到内存中" : ""}</Tooltip>
 					</Fragment>
@@ -171,7 +168,7 @@ export default function App(): JSX.Element {
 						maxLength={100}
 						allowClear
 						showCount
-						disabled={!editText}
+						disabled={!editImgColor || !editText}
 					/>
 				</Form.Item>
 				<Form.Item
@@ -184,11 +181,11 @@ export default function App(): JSX.Element {
 						placeholder="请输入文本颜色，形式为ff6666或f66"
 						addonBefore="#"
 						allowClear
-						disabled={!editText}
+						disabled={!editImgColor || !editText}
 					/>
 				</Form.Item>
 				<Form.Item className="placeimg-form-item" name="lineHeight" label="文本行高">
-					<Radio.Group disabled={!editText}>
+					<Radio.Group disabled={!editImgColor || !editText}>
 						{lineHeightsDom}
 					</Radio.Group>
 				</Form.Item>
@@ -197,7 +194,7 @@ export default function App(): JSX.Element {
 						min={fontSizeRange[0]}
 						max={fontSizeRange[1]}
 						marks={fontSizeRangeConfig}
-						disabled={!editText || !editTextSize}
+						disabled={!editImgColor || !editText || !editTextSize}
 					/>
 				</Form.Item>
 				<Form.Item className="placeimg-form-item btns" wrapperCol={{ offset: 5, span: 15 }}>

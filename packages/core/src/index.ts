@@ -4,7 +4,7 @@ figma.showUI(__html__, {
 });
 
 figma.ui.on("message", msg => {
-	if (msg.type !== "insert") {
+	if (msg.type === "insert") {
 		console.log(`Action: ${msg.type as string}`, msg); // data、width、height
 		const rect: RectangleNode = figma.currentPage.selection.length === 1 && figma.currentPage.selection[0].type === "RECTANGLE"
 			? figma.currentPage.selection[0] // 使用选中的矩形
