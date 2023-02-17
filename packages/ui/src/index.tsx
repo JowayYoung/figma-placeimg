@@ -46,6 +46,10 @@ export default function App(): JSX.Element {
 			style: { color: "#f66" }
 		}
 	};
+	const bgImgTips = loading
+		? "，图片正在生成中..."
+		: bgImg.url ? "，图片已生成并保存到内存中" : "";
+	console.log(bgImg);
 	const lineHeightsDom = LINE_HEIGHTS.map(v => <Radio.Button key={v.id} value={v.id}>{v.val}</Radio.Button>);
 	const onChange = async(change: FormType, allChange: FormType): Promise<void> => {
 		if (change.height !== undefined) {
@@ -53,7 +57,7 @@ export default function App(): JSX.Element {
 			const max = _height > 50 ? 50 : _height < 10 ? 10 : _height;
 			setFontSizeRange([10, max]);
 		}
-		if (change.bgImage) {
+		if (allChange.bgImage && (!bgImg.u8a || !bgImg.url)) {
 			setLoading(true);
 			const res = await DownloadImg();
 			setBgImg(res);
@@ -76,8 +80,9 @@ export default function App(): JSX.Element {
 			lineHeight: fontSize * lineHeight,
 			width: +width
 		};
-		console.log("渲染图像", renderOpts);
 		const data = bgImage && bgImg.u8a && bgImg.url ? bgImg.u8a : RenderImg(renderOpts);
+		console.log("渲染图像", renderOpts);
+		console.log(bgImage, bgImg.u8a, bgImg.url);
 		parent.postMessage({
 			pluginMessage: {
 				data,
@@ -139,7 +144,7 @@ export default function App(): JSX.Element {
 					className="placeimg-form-item"
 					name="bgColor"
 					label="图像颜色"
-					rules={[{ message: "图像颜色由HEX组成", pattern: /(^[0-9A-F]{6}$)|(^[0-9A-F]{3}$)/i, required: true }]}
+					rules={[{ message: "图像颜色由HEX组成", pattern: /(^[0-9A-F]{6}$)|(^[0-9A-F]{3}$)/i, required: editImgColor }]}
 				>
 					<Input
 						placeholder="请输入图像颜色，形式为ff6666或f66"
@@ -153,7 +158,7 @@ export default function App(): JSX.Element {
 						<Form.Item name="bgImage" valuePropName="checked" style={{ marginBottom: 0, marginRight: 10 }}>
 							<Switch />
 						</Form.Item>
-						<Tooltip title={bgImg.url}>随机图片由dog.ceo提供{bgImg.url ? "，图片已生成并保存到内存中" : ""}</Tooltip>
+						<Tooltip title={bgImg.url}>随机图片由dog.ceo提供{bgImgTips}</Tooltip>
 					</Fragment>
 				</Form.Item>
 				<Form.Item
