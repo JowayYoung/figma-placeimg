@@ -121,6 +121,7 @@ export default function App(): JSX.Element {
 	};
 	const onUpdate = (e: MessageEvent): void => {
 		if (e.data.pluginMessage.type === "update") {
+			onReset();
 			form.setFieldValue("width", e.data.pluginMessage.width);
 			form.setFieldValue("height", e.data.pluginMessage.height);
 		}
@@ -205,7 +206,25 @@ export default function App(): JSX.Element {
 					className="placeimg-form-item"
 					name="color"
 					label="文本颜色"
-					rules={[{ message: "文本颜色由HEX组成", pattern: DATA_REGEXP.color }]}
+					rules={[
+						{ message: "文本颜色由HEX组成", pattern: DATA_REGEXP.color },
+						({ getFieldValue }) => ({
+							async validator(_, val) {
+								let bgColor: string = getFieldValue("bgColor");
+								let color: string = val;
+								if (DATA_REGEXP.color.test(bgColor) && bgColor.length === 3) {
+									bgColor = bgColor.split("").map(v => `${v}${v}`).join("");
+								}
+								if (DATA_REGEXP.color.test(color) && color.length === 3) {
+									color = color.split("").map(v => `${v}${v}`).join("");
+								}
+								if (color && bgColor === color) {
+									return await Promise.reject(new Error("图像颜色不能与文本颜色一样"));
+								}
+								return await Promise.resolve();
+							}
+						})
+					]}
 				>
 					<Input
 						placeholder="请输入文本颜色，形式为ff6666或f66"
