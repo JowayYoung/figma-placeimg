@@ -1,10 +1,11 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { Button, Form, Input, Radio, Slider, Switch, Tooltip } from "antd";
+import { Button, Form, Input, Radio, Slider, Spin, Switch, Tooltip } from "antd";
 import { type SliderMarks } from "antd/es/slider";
+import ClassNames from "classnames";
 
 import "./assets/css/reset.css";
 import "./index.scss";
-import { LINE_HEIGHTS } from "./utils/getting";
+import { DATA_REGEXP, LINE_HEIGHTS } from "./utils/getting";
 import { type DownloadImgType, DownloadImg, RenderImg } from "./utils/setting";
 
 interface FormType {
@@ -19,12 +20,15 @@ interface FormType {
 }
 
 export default function App(): JSX.Element {
-	const [loading, setLoading] = useState<boolean>(false);
-	const [bgImg, setBgImg] = useState<DownloadImgType>({ u8a: null, url: "" });
+	const [loading, setLoading] = useState<0 | 1 | 2>(0);
+	const [bgImageData, setBgImg] = useState<DownloadImgType>({ u8a: null, url: "" });
 	const [fontSizeRange, setFontSizeRange] = useState<number[]>([10, 50]);
-	const [editImgColor, setEditImgColor] = useState<boolean>(true);
-	const [editText, setEditText] = useState<boolean>(false);
-	const [editTextSize, setEditTextSize] = useState<boolean>(false);
+	const [vaildSize, setVaildSize] = useState<boolean>(false);
+	const [vaildBgColor, setVaildBgColor] = useState<boolean>(false);
+	const [vaildBgImage, setVaildBgImage] = useState<boolean>(false);
+	const [vaildContent, setVaildContent] = useState<boolean>(false);
+	const [vaildTextSize, setVaildTextSize] = useState<boolean>(false);
+	const [hasBgColor, setHasBgColor] = useState<boolean>(false);
 	const [form] = Form.useForm();
 	const initForm: FormType = {
 		bgColor: "",
@@ -46,31 +50,44 @@ export default function App(): JSX.Element {
 			style: { color: "#f66" }
 		}
 	};
-	const bgImgTips = loading
+	const bgImgTips = loading === 1
 		? "，图片正在生成中..."
-		: bgImg.url ? "，图片已生成并保存到内存中" : "";
-	console.log(bgImg);
+		: bgImageData.url ? "，图片已生成并保存到内存中" : "";
 	const lineHeightsDom = LINE_HEIGHTS.map(v => <Radio.Button key={v.id} value={v.id}>{v.val}</Radio.Button>);
+	const loadingClasses = ClassNames("placeimg-mask pf fullscreen flex-ct-x", {
+		hide: loading === 2,
+		show: loading === 1
+	});
 	const onChange = async(change: FormType, allChange: FormType): Promise<void> => {
 		if (change.height !== undefined) {
+			const isNum = DATA_REGEXP.size.test(change.height);
 			const _height = +change.height;
-			const max = _height > 50 ? 50 : _height < 10 ? 10 : _height;
+			const max = isNum ? _height > 50 ? 50 : _height < 10 ? 10 : _height : 50;
 			setFontSizeRange([10, max]);
 		}
-		if (allChange.bgImage && (!bgImg.u8a || !bgImg.url)) {
-			setLoading(true);
+		if (allChange.bgImage) {
+			setLoading(1);
 			const res = await DownloadImg();
 			setBgImg(res);
-			setLoading(false);
+			setLoading(2);
 		} else {
 			setBgImg({ u8a: null, url: "" });
 		}
-		setEditImgColor(!allChange.bgImage);
-		setEditText(!!allChange.width && !!allChange.height);
-		setEditTextSize(+allChange.height >= 10);
+		setVaildSize(DATA_REGEXP.size.test(allChange.width) && DATA_REGEXP.size.test(allChange.height));
+		setVaildBgColor(DATA_REGEXP.color.test(allChange.bgColor));
+		setVaildBgImage(allChange.bgImage);
+		setVaildContent(DATA_REGEXP.content.test(allChange.content));
+		setVaildTextSize(DATA_REGEXP.size.test(allChange.height) && +allChange.height >= 10);
+		setHasBgColor(!!allChange.bgColor);
 	};
 	const onSubmit = (form: FormType): void => {
 		const { bgColor, bgImage, color, content, fontSize, height, lineHeight, width } = form;
+		const useBgImg = bgImage && bgImageData.u8a && bgImageData.url;
+		const downloadOpts = {
+			height: +height,
+			url: bgImageData.url,
+			width: +width
+		};
 		const renderOpts = {
 			bgColor: `#${bgColor || "f66"}`,
 			color: `#${color || "fff"}`,
@@ -80,9 +97,8 @@ export default function App(): JSX.Element {
 			lineHeight: fontSize * lineHeight,
 			width: +width
 		};
-		const data = bgImage && bgImg.u8a && bgImg.url ? bgImg.u8a : RenderImg(renderOpts);
-		console.log("渲染图像", renderOpts);
-		console.log(bgImage, bgImg.u8a, bgImg.url);
+		const data = useBgImg ? bgImageData.u8a : RenderImg(renderOpts);
+		useBgImg ? console.log("下载图像", downloadOpts) : console.log("渲染图像", renderOpts);
 		parent.postMessage({
 			pluginMessage: {
 				data,
@@ -93,7 +109,14 @@ export default function App(): JSX.Element {
 		}, "*");
 		onReset();
 	};
-	const onReset = (): void => form.resetFields();
+	const onReset = (): void => {
+		setVaildSize(false);
+		setVaildBgColor(false);
+		setVaildBgImage(false);
+		setVaildContent(false);
+		setVaildTextSize(false);
+		form.resetFields();
+	};
 	const onUpdate = (e: MessageEvent): void => {
 		if (e.data.pluginMessage.type === "update") {
 			form.setFieldValue("width", e.data.pluginMessage.width);
@@ -112,7 +135,6 @@ export default function App(): JSX.Element {
 				labelCol={{ span: 5 }}
 				wrapperCol={{ span: 15 }}
 				initialValues={initForm}
-				disabled={loading}
 				onFinish={onSubmit}
 				onValuesChange={onChange}
 			>
@@ -120,7 +142,7 @@ export default function App(): JSX.Element {
 					className="placeimg-form-item"
 					name="width"
 					label="图像宽度"
-					rules={[{ message: "图像宽度由正整数组成", pattern: /^[1-9]\d*$/, required: true }]}
+					rules={[{ message: "图像宽度由正整数组成", pattern: DATA_REGEXP.size, required: true }]}
 				>
 					<Input
 						placeholder="请输入图像宽度"
@@ -132,7 +154,7 @@ export default function App(): JSX.Element {
 					className="placeimg-form-item"
 					name="height"
 					label="图像高度"
-					rules={[{ message: "图像高度由正整数组成", pattern: /^[1-9]\d*$/, required: true }]}
+					rules={[{ message: "图像高度由正整数组成", pattern: DATA_REGEXP.size, required: true }]}
 				>
 					<Input
 						placeholder="请输入图像高度"
@@ -144,28 +166,29 @@ export default function App(): JSX.Element {
 					className="placeimg-form-item"
 					name="bgColor"
 					label="图像颜色"
-					rules={[{ message: "图像颜色由HEX组成", pattern: /(^[0-9A-F]{6}$)|(^[0-9A-F]{3}$)/i, required: editImgColor }]}
+					rules={[{ message: "图像颜色由HEX组成", pattern: DATA_REGEXP.color }]}
 				>
 					<Input
 						placeholder="请输入图像颜色，形式为ff6666或f66"
 						addonBefore="#"
+						addonAfter="默认为#f66"
 						allowClear
-						disabled={!editImgColor}
+						disabled={!vaildSize || vaildBgImage}
 					/>
 				</Form.Item>
 				<Form.Item className="placeimg-form-item switch" label="图像背景">
 					<Fragment>
 						<Form.Item name="bgImage" valuePropName="checked" style={{ marginBottom: 0, marginRight: 10 }}>
-							<Switch />
+							<Switch disabled={!vaildSize || vaildBgColor || vaildContent || hasBgColor} />
 						</Form.Item>
-						<Tooltip title={bgImg.url}>随机图片由dog.ceo提供{bgImgTips}</Tooltip>
+						<Tooltip title={bgImageData.url}>随机图片由dog.ceo提供{bgImgTips}</Tooltip>
 					</Fragment>
 				</Form.Item>
 				<Form.Item
 					className="placeimg-form-item"
 					name="content"
 					label="文本内容"
-					rules={[{ message: "文本内容由1~100个字符组成", pattern: /^.{1,100}$/ }]}
+					rules={[{ message: "文本内容由1~100个字符组成", pattern: DATA_REGEXP.content }]}
 				>
 					<Input
 						placeholder="请输入文本内容"
@@ -173,24 +196,25 @@ export default function App(): JSX.Element {
 						maxLength={100}
 						allowClear
 						showCount
-						disabled={!editImgColor || !editText}
+						disabled={!vaildSize || vaildBgImage || !vaildBgColor}
 					/>
 				</Form.Item>
 				<Form.Item
 					className="placeimg-form-item"
 					name="color"
 					label="文本颜色"
-					rules={[{ message: "文本颜色由HEX组成", pattern: /(^[0-9A-F]{6}$)|(^[0-9A-F]{3}$)/i }]}
+					rules={[{ message: "文本颜色由HEX组成", pattern: DATA_REGEXP.color }]}
 				>
 					<Input
 						placeholder="请输入文本颜色，形式为ff6666或f66"
 						addonBefore="#"
+						addonAfter="默认为#fff"
 						allowClear
-						disabled={!editImgColor || !editText}
+						disabled={!vaildSize || vaildBgImage || !vaildBgColor || !vaildContent}
 					/>
 				</Form.Item>
 				<Form.Item className="placeimg-form-item" name="lineHeight" label="文本行高">
-					<Radio.Group disabled={!editImgColor || !editText}>
+					<Radio.Group disabled={!vaildSize || vaildBgImage || !vaildBgColor || !vaildContent}>
 						{lineHeightsDom}
 					</Radio.Group>
 				</Form.Item>
@@ -199,7 +223,7 @@ export default function App(): JSX.Element {
 						min={fontSizeRange[0]}
 						max={fontSizeRange[1]}
 						marks={fontSizeRangeConfig}
-						disabled={!editImgColor || !editText || !editTextSize}
+						disabled={!vaildSize || vaildBgImage || !vaildBgColor || !vaildContent || !vaildTextSize}
 					/>
 				</Form.Item>
 				<Form.Item className="placeimg-form-item btns" wrapperCol={{ offset: 5, span: 15 }}>
@@ -219,6 +243,9 @@ export default function App(): JSX.Element {
 			</Form>
 			<div className="placeimg-img pr flex-ct-x">
 				<img className="placeimg-img-cover" id="placeimg-img" />
+			</div>
+			<div className={loadingClasses}>
+				<Spin size="large" tip="图片正在生成中..." />
 			</div>
 		</div>
 	);
