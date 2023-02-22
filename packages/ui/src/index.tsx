@@ -5,7 +5,7 @@ import ClassNames from "classnames";
 
 import "./assets/css/reset.css";
 import "./index.scss";
-import { DATA_REGEXP, LINE_HEIGHTS } from "./utils/getting";
+import { DATA_REGEXP } from "./utils/getting";
 import { type DownloadImgType, DownloadImg, RenderImg } from "./utils/setting";
 
 interface FormType {
@@ -14,6 +14,7 @@ interface FormType {
 	color: string
 	content: string
 	fontSize: number
+	fontWeight: "bold" | "normal"
 	height: string
 	lineHeight: 1 | 1.2 | 1.5
 	width: string
@@ -22,7 +23,7 @@ interface FormType {
 export default function App(): JSX.Element {
 	const [loading, setLoading] = useState<0 | 1 | 2>(0);
 	const [bgImageData, setBgImg] = useState<DownloadImgType>({ u8a: null, url: "" });
-	const [fontSizeRange, setFontSizeRange] = useState<number[]>([10, 50]);
+	const [fontSizeRange, setFontSizeRange] = useState<number[]>([10, 100]);
 	const [vaildSize, setVaildSize] = useState<boolean>(false);
 	const [vaildBgColor, setVaildBgColor] = useState<boolean>(false);
 	const [vaildBgImage, setVaildBgImage] = useState<boolean>(false);
@@ -36,6 +37,7 @@ export default function App(): JSX.Element {
 		color: "",
 		content: "",
 		fontSize: fontSizeRange[0],
+		fontWeight: "normal",
 		height: "",
 		lineHeight: 1,
 		width: ""
@@ -53,7 +55,6 @@ export default function App(): JSX.Element {
 	const bgImgTips = loading === 1
 		? "，图片正在生成中..."
 		: bgImageData.url ? "，图片已生成并保存到内存中" : "";
-	const lineHeightsDom = LINE_HEIGHTS.map(v => <Radio.Button key={v.id} value={v.id}>{v.val}</Radio.Button>);
 	const loadingClasses = ClassNames("placeimg-mask pf fullscreen flex-ct-x", {
 		hide: loading === 2,
 		show: loading === 1
@@ -62,7 +63,7 @@ export default function App(): JSX.Element {
 		if (change.height !== undefined) {
 			const isNum = DATA_REGEXP.size.test(change.height);
 			const _height = +change.height;
-			const max = isNum ? _height > 50 ? 50 : _height < 10 ? 10 : _height : 50;
+			const max = isNum ? _height > 100 ? 100 : _height < 10 ? 10 : _height : 100;
 			setFontSizeRange([10, max]);
 		}
 		if (allChange.bgImage) {
@@ -81,7 +82,7 @@ export default function App(): JSX.Element {
 		setHasBgColor(!!allChange.bgColor);
 	};
 	const onSubmit = (form: FormType): void => {
-		const { bgColor, bgImage, color, content, fontSize, height, lineHeight, width } = form;
+		const { bgColor, bgImage, color, content, fontSize, fontWeight, height, lineHeight, width } = form;
 		const useBgImg = bgImage && bgImageData.u8a && bgImageData.url;
 		const downloadOpts = {
 			height: +height,
@@ -93,6 +94,7 @@ export default function App(): JSX.Element {
 			color: `#${color || "fff"}`,
 			content,
 			fontSize,
+			fontWeight,
 			height: +height,
 			lineHeight: fontSize * lineHeight,
 			width: +width
@@ -215,7 +217,15 @@ export default function App(): JSX.Element {
 				</Form.Item>
 				<Form.Item className="placeimg-form-item" name="lineHeight" label="文本行高">
 					<Radio.Group disabled={!vaildSize || vaildBgImage || !vaildBgColor || !vaildContent}>
-						{lineHeightsDom}
+						<Radio.Button value={1}>1</Radio.Button>
+						<Radio.Button value={1.2}>1.2</Radio.Button>
+						<Radio.Button value={1.5}>1.5</Radio.Button>
+					</Radio.Group>
+				</Form.Item>
+				<Form.Item className="placeimg-form-item" name="fontWeight" label="文本粗细">
+					<Radio.Group disabled={!vaildSize || vaildBgImage || !vaildBgColor || !vaildContent}>
+						<Radio.Button value="normal">normal</Radio.Button>
+						<Radio.Button value="bold">bold</Radio.Button>
 					</Radio.Group>
 				</Form.Item>
 				<Form.Item className="placeimg-form-item" name="fontSize" label="文本尺寸">

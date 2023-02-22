@@ -24,6 +24,7 @@ interface RenderImgType {
 	color?: string
 	content?: string
 	fontSize?: number
+	fontWeight?: "normal" | "bold"
 	height?: number
 	lineHeight?: number
 	width?: number
@@ -34,6 +35,7 @@ function RenderImg({
 	color = "#fff",
 	content = "",
 	fontSize = 10,
+	fontWeight = "normal",
 	height = 200,
 	lineHeight = 10,
 	width = 200
@@ -49,7 +51,7 @@ function RenderImg({
 		ctx.fill();
 	}
 	if (ctx && content && height >= 10) {
-		ctx.font = `${fontSize}px sans-serif`;
+		ctx.font = `normal ${fontWeight === "bold" ? "bold" : ""} ${fontSize}px PingFang SC, Microsoft YaHei, sans-serif`;
 		ctx.textAlign = "center";
 		ctx.textBaseline = "middle";
 		ctx.fillStyle = color;
